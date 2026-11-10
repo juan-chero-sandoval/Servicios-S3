@@ -1,4 +1,4 @@
-package pe.vales.api;
+package pe.vales.controller;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

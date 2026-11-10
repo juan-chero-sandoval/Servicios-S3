@@ -3,45 +3,43 @@
     const app = globalThis.Vales;
     const { money, quantity: qty, escape: esc, date, dateTime, status } = app.Formatters;
     class AtencionView {
-        constructor(root, viewModel, navigate = url => globalThis.location.replace(url)) {
-            this.root = root; this.vm = viewModel; this.navigate = navigate;
+        constructor(root, navigate = url => globalThis.location.replace(url)) {
+            this.root = root; this.navigate = navigate;
             this.checkoutRevision = -1; this.lastDetail = undefined; this.lastItems = undefined;
             this.$ = selector => this.root.querySelector(selector);
-            this.bind();
-            this.unsubscribe = this.vm.subscribe(state => this.render(state));
         }
-        bind() {
+        bind(actions) {
             const $ = this.$;
             $('#rows').addEventListener('change', event => {
-                if (event.target.dataset.code) this.vm.select(event.target.dataset.code, event.target.checked);
+                if (event.target.dataset.code) actions.select(event.target.dataset.code, event.target.checked);
             });
             $('#rows').addEventListener('click', event => {
                 const button = event.target.closest('.detail');
-                if (button) this.vm.openDetail(button.dataset.code);
+                if (button) actions.openDetail(button.dataset.code);
             });
-            $('#select-page').addEventListener('change', event => this.vm.selectPage(event.target.checked));
-            $('#clear').addEventListener('click', () => this.vm.clearSelection());
+            $('#select-page').addEventListener('change', event => actions.selectPage(event.target.checked));
+            $('#clear').addEventListener('click', () => actions.clearSelection());
             $('#filters').addEventListener('submit', event => {
-                event.preventDefault(); this.vm.search($('#search').value, $('#zonal').value);
+                event.preventDefault(); actions.search($('#search').value, $('#zonal').value);
             });
-            $('#zonal').addEventListener('change', () => this.vm.search($('#search').value, $('#zonal').value));
-            for (const tab of this.root.querySelectorAll('.tab')) tab.addEventListener('click', () => this.vm.changeState(tab.dataset.state));
-            $('#prev').addEventListener('click', () => this.vm.changePage(-1));
-            $('#next').addEventListener('click', () => this.vm.changePage(1));
-            $('#refresh').addEventListener('click', () => this.vm.refresh());
-            $('#review').addEventListener('click', () => this.vm.reviewSelected());
-            $('#logout').addEventListener('click', () => this.vm.logout());
-            $('#attention-form').addEventListener('submit', event => { event.preventDefault(); this.vm.save(); });
+            $('#zonal').addEventListener('change', () => actions.search($('#search').value, $('#zonal').value));
+            for (const tab of this.root.querySelectorAll('.tab')) tab.addEventListener('click', () => actions.changeState(tab.dataset.state));
+            $('#prev').addEventListener('click', () => actions.changePage(-1));
+            $('#next').addEventListener('click', () => actions.changePage(1));
+            $('#refresh').addEventListener('click', () => actions.refresh());
+            $('#review').addEventListener('click', () => actions.reviewSelected());
+            $('#logout').addEventListener('click', () => actions.logout());
+            $('#attention-form').addEventListener('submit', event => { event.preventDefault(); actions.save(); });
             $('#checkout-items').addEventListener('input', event => {
                 const item = event.target.closest('.attention-item');
-                if (item) this.vm.editDraft(item.dataset.code, event.target.name, event.target.value);
+                if (item) actions.editDraft(item.dataset.code, event.target.name, event.target.value);
             });
-            for (const button of this.root.querySelectorAll('.close-dialog')) button.addEventListener('click', () => this.vm.closeCheckout());
-            $('#checkout').addEventListener('cancel', event => { event.preventDefault(); this.vm.closeCheckout(); });
-            for (const button of this.root.querySelectorAll('.close-details')) button.addEventListener('click', () => this.vm.closeDetail());
-            $('#details').addEventListener('cancel', event => { event.preventDefault(); this.vm.closeDetail(); });
+            for (const button of this.root.querySelectorAll('.close-dialog')) button.addEventListener('click', () => actions.closeCheckout());
+            $('#checkout').addEventListener('cancel', event => { event.preventDefault(); actions.closeCheckout(); });
+            for (const button of this.root.querySelectorAll('.close-details')) button.addEventListener('click', () => actions.closeDetail());
+            $('#details').addEventListener('cancel', event => { event.preventDefault(); actions.closeDetail(); });
             $('#detail-content').addEventListener('click', event => {
-                if (event.target.closest('#attend-detail')) this.vm.attendDetail();
+                if (event.target.closest('#attend-detail')) actions.attendDetail();
             });
         }
         render(state) {

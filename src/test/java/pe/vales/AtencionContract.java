@@ -12,7 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import pe.vales.api.AtencionRequest;
+import pe.vales.model.dto.AtencionRequest;
 import pe.vales.domain.ReglaException;
 import pe.vales.service.AtencionService;
 import static org.assertj.core.api.Assertions.*;
@@ -39,11 +39,11 @@ abstract class AtencionContract {
     String body(String code,String cantidad,String precio) {
         return "{\"vales\":[{\"codigoVale\":\""+code+"\",\"cantidadConsumida\":"+cantidad+",\"precioReal\":"+precio+",\"ticket\":\"T001-42\"}]}";
     }
-    @Test void sirveLoginMvvmSinSesion() throws Exception {
+    @Test void sirveLoginMvcSinSesion() throws Exception {
         mvc.perform(get("/login.html")).andExpect(status().isOk())
             .andExpect(content().string(org.hamcrest.Matchers.containsString("/js/login.js")));
-        for (String asset : List.of("core/observable-view-model.js", "core/api-client.js", "models/session-model.js",
-                "viewmodels/login-view-model.js", "views/login-view.js", "login.js")) {
+        for (String asset : List.of("core/api-client.js", "models/session-model.js", "models/login-model.js",
+                "controllers/login-controller.js", "views/login-view.js", "login.js")) {
             mvc.perform(get("/js/" + asset)).andExpect(status().isOk())
                 .andExpect(content().string(org.hamcrest.Matchers.containsString("use strict")));
         }

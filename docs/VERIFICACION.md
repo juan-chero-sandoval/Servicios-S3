@@ -23,11 +23,11 @@ Las pruebas independientes confirman las reglas puras y la aritmética JavaScrip
 
 El 9 de noviembre de 2026, la ejecución desde la terminal del usuario confirmó `Started ValesApplication` y Tomcat en el puerto 8080, con conexión a H2. También se comprobó la existencia de la clase principal compilada y del archivo de la base de datos. Esta evidencia actualiza la limitación inicial sobre compilación y arranque; no acredita la ejecución de las pruebas de integración ni la conexión contra PostgreSQL.
 
-## Reorganización MVVM
+## Reorganización MVC
 
-- Se ejecutaron correctamente **25 pruebas** de modelos y ViewModels con JavaScriptCore, utilizando las clases reales con dependencias de datos simuladas.
-- Se comprobó la sintaxis de los scripts JavaScript, las referencias a archivos y selectores de las vistas, la ausencia de acceso al DOM en modelos/ViewModels y la ausencia de peticiones HTTP en las vistas.
-- Se compilaron todas las clases Java principales con `javac` y las dependencias disponibles en caché. La compilación terminó correctamente; mantiene una advertencia previa sobre `AntPathRequestMatcher`.
-- Se intentó `./gradlew test --offline --no-daemon`. Gradle no pudo iniciar su daemon porque este entorno rechaza el socket local (`SocketException: Operation not permitted`). No se afirma que las pruebas de integración hayan pasado.
-- Se añadió al contrato de integración una comprobación de acceso sin sesión a la vista y a los scripts del login MVVM. Se ejecutará junto con las demás mediante `./gradlew test` en una terminal con permisos normales.
-- La revisión completa en navegador de esta reorganización queda pendiente. Reiniciar `bootRun` y recargar la página permite probarla con la misma base H2 existente.
+- Se ejecutaron correctamente **27 pruebas** de modelos y controladores con JavaScriptCore, utilizando clases reales, una vista espía y dependencias de datos simuladas.
+- Se comprobó la sintaxis de los scripts, las referencias a archivos y selectores, la ausencia de DOM en modelos/controladores y la ausencia de peticiones HTTP en las vistas. Las pruebas comprueban la dirección explícita del renderizado desde el controlador.
+- Se compilaron todas las clases Java principales con `javac` y las dependencias en caché, incluyendo los paquetes `controller`, `model` y `model/dto`. Se mantiene una advertencia previa sobre `AntPathRequestMatcher`.
+- Las pruebas completas de Spring siguen pendientes: el último intento desde este entorno falló al iniciar el daemon de Gradle porque no se permiten sockets locales (`SocketException: Operation not permitted`).
+- El contrato de integración se actualizó para comprobar el acceso sin sesión a la vista y los scripts del login MVC. Se ejecutará con `./gradlew test` en una terminal con permisos normales.
+- El arranque anterior con H2 es evidencia de la versión previa, no de esta reorganización. La ejecución y revisión completa en navegador de MVC quedan pendientes. No se afirma que un servidor esté activo ahora.

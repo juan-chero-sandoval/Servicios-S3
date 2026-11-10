@@ -1,4 +1,4 @@
-package pe.vales.api;
+package pe.vales.model.dto;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import java.math.BigDecimal;

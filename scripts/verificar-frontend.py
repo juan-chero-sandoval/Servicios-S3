@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Comprueba sintaxis, separación MVVM y pruebas de modelos/ViewModels con JavaScriptCore."""
+"""Comprueba sintaxis, separación MVC y pruebas de modelos/controladores con JavaScriptCore."""
 from pathlib import Path
 import ctypes as C
 import ctypes.util
@@ -31,7 +31,7 @@ def evaluate(source, label):
 try:
     import re, json
     static = root / 'src/main/resources/static'
-    files = sorted((static / 'js').rglob('*.js')) + [root / 'scripts/tests/frontend-mvvm.spec.js', root / 'scripts/test-frontend.cjs']
+    files = sorted((static / 'js').rglob('*.js')) + [root / 'scripts/tests/frontend-mvc.spec.js', root / 'scripts/test-frontend.cjs']
     for file in files:
         source = lib.JSStringCreateWithUTF8CString(file.read_bytes())
         error = ptr()
@@ -39,7 +39,7 @@ try:
         lib.JSStringRelease(source)
         if not valid: raise AssertionError(str(file) + ': ' + message(error))
     print(str(len(files)) + ' archivos JavaScript: sintaxis válida.')
-    for folder in ['models', 'viewmodels']:
+    for folder in ['models', 'controllers']:
         for file in (static / 'js' / folder).glob('*.js'):
             assert not re.search(r'\b(document|window|location|innerHTML)\b', file.read_text()), file
     for file in (static / 'js/views').glob('*.js'):
@@ -52,12 +52,13 @@ try:
     view = (static / 'js/views/atencion-view.js').read_text()
     selectors = set(re.findall(r"\$\('#([A-Za-z0-9-]+)'\)", view))
     assert not selectors - ids, selectors - ids
-    print('Separación MVVM, selectores y referencias de assets: correctas.')
-    load_order = ['core/observable-view-model.js', 'core/api-client.js', 'models/session-model.js',
-        'models/vale-model.js', 'viewmodels/login-view-model.js', 'viewmodels/atencion-view-model.js', 'views/formatters.js']
+    assert not (static / 'js/viewmodels').exists(), 'Quedó una carpeta del patrón anterior.'
+    print('Separación MVC, selectores y referencias de assets: correctas.')
+    load_order = ['core/api-client.js', 'models/session-model.js', 'models/vale-model.js',
+        'models/atencion-model.js', 'models/login-model.js', 'controllers/login-controller.js', 'controllers/atencion-controller.js', 'views/formatters.js']
     for name in load_order:
         evaluate((static / 'js' / name).read_text(), name)
-    evaluate((root / 'scripts/tests/frontend-mvvm.spec.js').read_text(), 'tests')
+    evaluate((root / 'scripts/tests/frontend-mvc.spec.js').read_text(), 'tests')
     evaluate("globalThis.testResult = null; runFrontendTests().then(results => { globalThis.testResult = { ok: true, results }; }, error => { globalThis.testResult = { ok: false, error: error.message }; });", 'suite')
     for _ in range(100):
         result = json.loads(message(evaluate('JSON.stringify(globalThis.testResult)', 'resultado')))
@@ -65,6 +66,6 @@ try:
     assert result is not None, 'La suite no terminó.'
     assert result['ok'], result.get('error')
     for name in result['results']: print('OK ' + name)
-    print(str(len(result['results'])) + ' pruebas MVVM correctas.')
+    print(str(len(result['results'])) + ' pruebas MVC correctas.')
 finally:
     lib.JSGlobalContextRelease(ctx)

@@ -3,7 +3,8 @@ import java.time.*;
 import java.util.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import pe.vales.api.AtencionRequest;
+import pe.vales.model.dto.AtencionRequest;
+import pe.vales.model.Vale;
 import pe.vales.domain.*;
 import pe.vales.persistence.ValeRepository;
 @Service
@@ -12,7 +13,7 @@ public class AtencionService {
     private final Clock clock;
     public AtencionService(ValeRepository repo, Clock clock) { this.repo=repo; this.clock=clock; }
     @Transactional(timeout=15)
-    public List<ValeRepository.Vale> registrar(AtencionRequest request, String ruc, String usuario) {
+    public List<Vale> registrar(AtencionRequest request, String ruc, String usuario) {
         var codigos=new HashSet<String>();
         for(var item:request.vales())
             if(!codigos.add(item.codigoVale())) throw new ReglaException(422,"El lote contiene un vale repetido.");

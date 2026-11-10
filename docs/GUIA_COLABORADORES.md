@@ -69,7 +69,7 @@ java -jar build/libs/vales-atencion-1.0.0.jar
 
 Ejecuta el JAR desde una carpeta fija si quieres reutilizar la misma base H2, cuya ruta depende del directorio de trabajo.
 
-En Linux/macOS con Bash, `./scripts/verificar-dominio.sh` comprueba reglas de negocio sin descargar dependencias. `python3 scripts/verificar-frontend.py` verifica la arquitectura y ejecuta 25 pruebas de modelos y ViewModels en Linux con JavaScriptCore GTK. Alternativamente, con Node.js instalado puedes ejecutar `node scripts/test-frontend.cjs`, sin instalar paquetes. Ambas son opciones para pruebas; no necesitas Node ni JavaScriptCore para usar la aplicación.
+En Linux/macOS con Bash, `./scripts/verificar-dominio.sh` comprueba reglas de negocio sin descargar dependencias. `python3 scripts/verificar-frontend.py` verifica la arquitectura y ejecuta 27 pruebas de modelos y controladores en Linux con JavaScriptCore GTK. Alternativamente, con Node.js instalado puedes ejecutar `node scripts/test-frontend.cjs`, sin instalar paquetes. Ambas son opciones para pruebas; no necesitas Node ni JavaScriptCore para usar la aplicación.
 
 El estado de las comprobaciones realizadas durante la entrega está en [VERIFICACION.md](VERIFICACION.md).
 
@@ -77,12 +77,13 @@ El estado de las comprobaciones realizadas durante la entrega está en [VERIFICA
 
 | Ruta | Contenido |
 | --- | --- |
-| `src/main/resources/static` | HTML, estilos y puntos de entrada de la presentación MVVM |
+| `src/main/resources/static` | HTML, estilos y puntos de entrada de la presentación MVC |
 | `src/main/resources/static/js/views` | Renderizado del DOM y enlace de eventos (View) |
-| `src/main/resources/static/js/viewmodels` | Estado observable y comandos de atención/login (ViewModel) |
-| `src/main/resources/static/js/models` | Operaciones de vales/sesión y reglas de presentación (Model) |
-| `src/main/resources/static/js/core` | Observabilidad y cliente HTTP/CSRF |
-| `src/main/java/pe/vales/api` | Endpoints, datos de entrada y errores |
+| `src/main/resources/static/js/controllers` | Acciones y coordinación de atención/login (Controller) |
+| `src/main/resources/static/js/models` | Datos, estado de atención/login, borradores y reglas (Model) |
+| `src/main/resources/static/js/core` | Cliente HTTP/CSRF |
+| `src/main/java/pe/vales/controller` | Controladores HTTP y respuestas de error |
+| `src/main/java/pe/vales/model` | Modelos de datos y DTO de atención |
 | `src/main/java/pe/vales/service` | Transacción de atención individual o por lote |
 | `src/main/java/pe/vales/domain` | Reglas y cálculo del importe |
 | `src/main/java/pe/vales/persistence` | SQL parametrizado, consultas y bloqueo de filas |
@@ -91,9 +92,9 @@ El estado de las comprobaciones realizadas durante la entrega está en [VERIFICA
 | `docs/API.md` | Contrato HTTP y ejemplos |
 | `docs/BASE_DE_DATOS.md` | Análisis y correspondencia con la base recibida |
 
-La explicación del patrón, el flujo de datos y las reglas para mantener la separación están en [ARQUITECTURA_MVVM.md](ARQUITECTURA_MVVM.md).
+La explicación del patrón, el flujo de datos y las reglas para mantener la separación están en [ARQUITECTURA_MVC.md](ARQUITECTURA_MVC.md).
 
-Después de actualizar a esta versión, reinicia `bootRun` y recarga el navegador para cargar los nuevos scripts. Los datos H2 existentes se conservan.
+Después de actualizar a esta versión, ejecuta `./gradlew clean bootRun` (Windows: `.\gradlew.bat clean bootRun`) y recarga el navegador para cargar los nuevos scripts. Los datos H2 existentes se conservan.
 
 ## Conectar PostgreSQL
 

@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.jdbc.core.namedparam.*;
 import org.springframework.stereotype.Repository;
 import pe.vales.domain.*;
+import pe.vales.model.*;
 @Repository
 public class ValeRepository {
     private final NamedParameterJdbcTemplate jdbc;
@@ -20,13 +21,6 @@ public class ValeRepository {
         this.unidad=table.equals("vales") ? "codigo_unidad_movil" : "codigo_unidad";
         this.activo=table.equals("vales") ? "TRUE" : "COALESCE(v.estado, FALSE)";
     }
-    public record Vale(String codigoVale, String zonal, String codZonal, String localidad,
-        String codProveedor, String proveedor, String nrocontrato, String trabajador,
-        String placa, String tipoVehiculo, String idSuministro, BigDecimal cantidadEmitida,
-        BigDecimal precioReferencial, int estadoVale, String estado, boolean activo,
-        LocalDateTime fechaEmision, LocalDateTime fechaConsumo, BigDecimal cantidadConsumida,
-        BigDecimal precioReal, BigDecimal importe, String ticket, String usuario) {}
-    public record Pagina(List<Vale> items, long total, int pagina, int tamanio) {}
     private String select() {
         return "SELECT v.*, v."+precio+" AS precio_ref, "+activo+" AS activo_b, "
             +"z.nom_zona, l.nom_localidad, p.razon_social, "
@@ -53,7 +47,7 @@ public class ValeRepository {
     private static LocalDateTime date(ResultSet r, String key) throws SQLException {
         var t=r.getTimestamp(key); return t==null ? null : t.toLocalDateTime();
     }
-    public Pagina listar(String ruc, Integer estado, String busqueda, String zonal, int pagina, int tamanio) {
+    public PaginaVales listar(String ruc, Integer estado, String busqueda, String zonal, int pagina, int tamanio) {
         var args=new MapSqlParameterSource("ruc", ruc);
         String where=" WHERE v.cod_proveedor=:ruc";
         if (estado!=null) { where+=" AND v.estado_vale=:estado"; args.addValue("estado",estado); }
@@ -65,7 +59,7 @@ public class ValeRepository {
         String from=select().substring(select().indexOf(" FROM "));
         long total=jdbc.queryForObject("SELECT count(*)"+from+where,args,Long.class);
         args.addValue("limit",tamanio).addValue("offset",(long)pagina*tamanio);
-        return new Pagina(jdbc.query(select()+where+" ORDER BY v.codigo_vale DESC LIMIT :limit OFFSET :offset",args,this::map),total,pagina,tamanio);
+        return new PaginaVales(jdbc.query(select()+where+" ORDER BY v.codigo_vale DESC LIMIT :limit OFFSET :offset",args,this::map),total,pagina,tamanio);
     }
     public Vale obtener(String codigo, String ruc) {
         var rows=jdbc.query(select()+" WHERE v.codigo_vale=:codigo AND v.cod_proveedor=:ruc",Map.of("codigo",codigo,"ruc",ruc),this::map);
