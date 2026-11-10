@@ -1,0 +1,13 @@
+.gradle/
+build/
+data/
+.env
+*.log
+.idea/
+
+.env.*
+!.env.example
+*.mv.db
+*.trace.db
+*.class
+out/
