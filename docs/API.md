@@ -11,6 +11,10 @@ Base: `http://localhost:8080`. JSON UTF-8. Las consultas requieren sesión. Las 
 
 El frontend hace estos pasos automáticamente. No se usa HTTP Basic ni se colocan credenciales en las URLs.
 
+## Salud
+
+`GET /actuator/health` es público y no requiere sesión. Devuelve `{"status":"UP"}` sin detalles; si la base no responde, el estado cambia y el HTTP deja de ser 200. Los demás endpoints de actuator no están expuestos.
+
 ## Consultas
 
 | Método y ruta | Respuesta |

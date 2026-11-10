@@ -11,3 +11,4 @@ data/
 *.trace.db
 *.class
 out/
+.run/

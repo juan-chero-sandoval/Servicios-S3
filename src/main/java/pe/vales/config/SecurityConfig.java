@@ -8,7 +8,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 @Configuration
 public class SecurityConfig {
     @Bean Clock clock() { return Clock.system(ZoneId.of("America/Lima")); }
@@ -20,13 +19,14 @@ public class SecurityConfig {
         return new InMemoryUserDetailsManager(User.withUsername(usuario).password(encoder.encode(password)).roles("GRIFO").build());
     }
     @Bean SecurityFilterChain security(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests(a->a.requestMatchers("/login.html","/js/**","/style.css","/api/csrf","/favicon.svg","/error").permitAll()
+        http.authorizeHttpRequests(a->a.requestMatchers("/login.html","/js/**","/style.css","/api/csrf","/favicon.svg","/error","/actuator/health","/actuator/health/**").permitAll()
             .anyRequest().hasRole("GRIFO"))
             .formLogin(f->f.loginPage("/login.html").loginProcessingUrl("/login")
                 .successHandler((req,res,auth)->res.setStatus(204))
                 .failureHandler((req,res,ex)->res.sendError(401,"Credenciales incorrectas")))
             .logout(l->l.logoutUrl("/logout").logoutSuccessHandler((req,res,auth)->res.setStatus(204)))
-            .exceptionHandling(e->e.defaultAuthenticationEntryPointFor((req,res,ex)->res.sendError(401),new AntPathRequestMatcher("/api/**")))
+            .exceptionHandling(e->e.defaultAuthenticationEntryPointFor((req,res,ex)->res.sendError(401),
+                request -> request.getRequestURI().startsWith("/api/")))
             .headers(h->h.contentSecurityPolicy(c->c.policyDirectives("default-src 'self'; script-src 'self'; style-src 'self'; img-src 'self'; object-src 'none'; base-uri 'self'; frame-ancestors 'none'")));
         return http.build();
     }

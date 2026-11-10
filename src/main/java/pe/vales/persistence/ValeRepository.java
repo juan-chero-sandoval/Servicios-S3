@@ -53,7 +53,7 @@ public class ValeRepository {
         if (estado!=null) { where+=" AND v.estado_vale=:estado"; args.addValue("estado",estado); }
         if (zonal!=null && !zonal.isBlank()) { where+=" AND v.cod_zonal=:zonal"; args.addValue("zonal",zonal); }
         if (busqueda!=null && !busqueda.isBlank()) {
-            where+=" AND (lower(v.codigo_vale) LIKE :q ESCAPE '!' OR lower(u.placa) LIKE :q ESCAPE '!' OR lower(pe.nombre) LIKE :q ESCAPE '!')";
+            where+=" AND (v.codigo_vale LIKE :q ESCAPE '!' OR lower(u.placa) LIKE :q ESCAPE '!' OR lower(pe.nombre) LIKE :q ESCAPE '!')";
             args.addValue("q","%"+busqueda.trim().toLowerCase(Locale.ROOT).replace("!","!!").replace("%","!%").replace("_","!_")+"%");
         }
         String from=select().substring(select().indexOf(" FROM "));

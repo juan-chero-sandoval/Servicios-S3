@@ -1,5 +1,14 @@
 # Verificación de la entrega
 
+## Actualización 10/11/2026
+
+- `gradle check bootJar` con Gradle 8.14.6 y JDK 21: **BUILD SUCCESSFUL**.
+- **20 pruebas de integración**: 10 para `vales` y 10 para `logis_vales`; 0 fallos.
+- **28 verificaciones de dominio**; 0 fallos.
+- **27 pruebas MVC de frontend** con Node; 0 fallos.
+- Arranque H2 en Docker y `GET /actuator/health`: HTTP 200 con `{"status":"UP"}` sin detalles.
+- Conexión contra PostgreSQL administrativo: pendiente de dump o credenciales del profesor.
+
 ## Ejecutado correctamente
 
 - Compilación con `javac` y ejecución de `ConsumoPolicy`, `ReglaException` y el ejecutor independiente `PolicyCheck`: **28 comprobaciones**.
@@ -7,13 +16,11 @@
 - Revisión de sintaxis de `app.js` y `login.js` con JavaScriptCore.
 - **13 comprobaciones** de aritmética y formatos numéricos del frontend con JavaScriptCore. El cálculo usa enteros BigInt para evitar errores de redondeo en la vista previa.
 
-## Preparado, pendiente de ejecución
+## Pruebas de integración
 
 Los contratos `AtencionValesTest` y `AtencionLogisTest` heredan diez pruebas de integración cada uno, con bases H2 independientes. Cubren HTTP, autenticación, CSRF, datos de emisión intactos, redondeo, validación, aislamiento por proveedor, filtros/paginación, duplicados, rollback de lote y dos hilos intentando consumir un mismo vale.
 
-Las pruebas de integración siguen pendientes de ejecución confirmada. Al intentar ejecutarlas inicialmente desde el entorno del agente, la descarga de Gradle falló con `java.net.SocketException: Operation not permitted` por restricciones de red.
-
-Posteriormente, el arranque desde la terminal del usuario confirmó la compilación y la conexión H2, tal como se detalla al final. Aún deben verificarse los recorridos de la interfaz, los contratos de integración y la conexión contra una base PostgreSQL de desarrollo. El comando para ello es `./gradlew test bootJar` (en Windows, `.\gradlew.bat test bootJar`).
+Se ejecutaron el 10/11/2026 con `gradle check bootJar`: **20 pruebas, 0 fallos**. La primera ejecución desde el entorno del agente había fallado por restricciones de red; la ejecución actual con Docker/Gradle 8.14.6 y JDK 21 quedó confirmada. La conexión contra una base PostgreSQL administrativa sigue pendiente de credenciales o dump.
 
 ## Alcance de las comprobaciones
 
@@ -27,7 +34,7 @@ El 9 de noviembre de 2026, la ejecución desde la terminal del usuario confirmó
 
 - Se ejecutaron correctamente **27 pruebas** de modelos y controladores con JavaScriptCore, utilizando clases reales, una vista espía y dependencias de datos simuladas.
 - Se comprobó la sintaxis de los scripts, las referencias a archivos y selectores, la ausencia de DOM en modelos/controladores y la ausencia de peticiones HTTP en las vistas. Las pruebas comprueban la dirección explícita del renderizado desde el controlador.
-- Se compilaron todas las clases Java principales con `javac` y las dependencias en caché, incluyendo los paquetes `controller`, `model` y `model/dto`. Se mantiene una advertencia previa sobre `AntPathRequestMatcher`.
-- Las pruebas completas de Spring siguen pendientes: el último intento desde este entorno falló al iniciar el daemon de Gradle porque no se permiten sockets locales (`SocketException: Operation not permitted`).
-- El contrato de integración se actualizó para comprobar el acceso sin sesión a la vista y los scripts del login MVC. Se ejecutará con `./gradlew test` en una terminal con permisos normales.
-- El arranque anterior con H2 es evidencia de la versión previa, no de esta reorganización. La ejecución y revisión completa en navegador de MVC quedan pendientes. No se afirma que un servidor esté activo ahora.
+- Se compilaron todas las clases Java principales con `javac` y las dependencias en caché, incluyendo los paquetes `controller`, `model` y `model/dto`. Se reemplazó `AntPathRequestMatcher` por un `RequestMatcher` lambda; el build ya no emite esa advertencia.
+- Las pruebas completas de Spring se ejecutaron el 10/11/2026: 20 pruebas de integración, 0 fallos.
+- El contrato de integración comprueba el acceso sin sesión a la vista y los scripts del login MVC; se ejecutó con `./gradlew check`.
+- El arranque H2 de esta versión se verificó en Docker y el healthcheck respondió 200. La revisión visual completa en navegador sigue recomendada.
