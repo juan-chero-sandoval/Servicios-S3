@@ -20,7 +20,7 @@ public class SecurityConfig {
         return new InMemoryUserDetailsManager(User.withUsername(usuario).password(encoder.encode(password)).roles("GRIFO").build());
     }
     @Bean SecurityFilterChain security(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests(a->a.requestMatchers("/login.html","/login.js","/style.css","/api/csrf","/favicon.svg","/error").permitAll()
+        http.authorizeHttpRequests(a->a.requestMatchers("/login.html","/js/**","/style.css","/api/csrf","/favicon.svg","/error").permitAll()
             .anyRequest().hasRole("GRIFO"))
             .formLogin(f->f.loginPage("/login.html").loginProcessingUrl("/login")
                 .successHandler((req,res,auth)->res.setStatus(204))

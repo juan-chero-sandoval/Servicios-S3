@@ -69,7 +69,7 @@ java -jar build/libs/vales-atencion-1.0.0.jar
 
 Ejecuta el JAR desde una carpeta fija si quieres reutilizar la misma base H2, cuya ruta depende del directorio de trabajo.
 
-En Linux/macOS con Bash, `./scripts/verificar-dominio.sh` comprueba reglas de negocio sin descargar dependencias. `python3 scripts/verificar-frontend.py` es una verificación adicional para Linux con JavaScriptCore GTK; no es necesaria para iniciar el proyecto ni reemplaza probar el navegador.
+En Linux/macOS con Bash, `./scripts/verificar-dominio.sh` comprueba reglas de negocio sin descargar dependencias. `python3 scripts/verificar-frontend.py` verifica la arquitectura y ejecuta 25 pruebas de modelos y ViewModels en Linux con JavaScriptCore GTK. Alternativamente, con Node.js instalado puedes ejecutar `node scripts/test-frontend.cjs`, sin instalar paquetes. Ambas son opciones para pruebas; no necesitas Node ni JavaScriptCore para usar la aplicación.
 
 El estado de las comprobaciones realizadas durante la entrega está en [VERIFICACION.md](VERIFICACION.md).
 
@@ -77,7 +77,11 @@ El estado de las comprobaciones realizadas durante la entrega está en [VERIFICA
 
 | Ruta | Contenido |
 | --- | --- |
-| `src/main/resources/static` | Frontend HTML, CSS y JavaScript |
+| `src/main/resources/static` | HTML, estilos y puntos de entrada de la presentación MVVM |
+| `src/main/resources/static/js/views` | Renderizado del DOM y enlace de eventos (View) |
+| `src/main/resources/static/js/viewmodels` | Estado observable y comandos de atención/login (ViewModel) |
+| `src/main/resources/static/js/models` | Operaciones de vales/sesión y reglas de presentación (Model) |
+| `src/main/resources/static/js/core` | Observabilidad y cliente HTTP/CSRF |
 | `src/main/java/pe/vales/api` | Endpoints, datos de entrada y errores |
 | `src/main/java/pe/vales/service` | Transacción de atención individual o por lote |
 | `src/main/java/pe/vales/domain` | Reglas y cálculo del importe |
@@ -86,6 +90,10 @@ El estado de las comprobaciones realizadas durante la entrega está en [VERIFICA
 | `src/test/java/pe/vales` | Pruebas de integración |
 | `docs/API.md` | Contrato HTTP y ejemplos |
 | `docs/BASE_DE_DATOS.md` | Análisis y correspondencia con la base recibida |
+
+La explicación del patrón, el flujo de datos y las reglas para mantener la separación están en [ARQUITECTURA_MVVM.md](ARQUITECTURA_MVVM.md).
+
+Después de actualizar a esta versión, reinicia `bootRun` y recarga el navegador para cargar los nuevos scripts. Los datos H2 existentes se conservan.
 
 ## Conectar PostgreSQL
 

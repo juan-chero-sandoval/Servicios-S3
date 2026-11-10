@@ -1,6 +1,6 @@
 # Atención de vales de combustible — Servicio B
 
-Aplicación Java 21 + Spring Boot 3.5.7, Spring JDBC, Spring Security y frontend HTML/CSS/JavaScript servido por la misma aplicación. Se limita a validar y registrar la **atención de vales autorizados**.
+Aplicación con presentación **MVVM**, Java 21 + Spring Boot 3.5.7, Spring JDBC, Spring Security y frontend HTML/CSS/JavaScript servido por la misma aplicación. Se limita a validar y registrar la **atención de vales autorizados**.
 
 ## Descargar y ejecutar la demo
 
@@ -87,7 +87,19 @@ La aplicación escucha inicialmente solo en `127.0.0.1`. `SERVER_ADDRESS` y `POR
 
 ## Organización del código
 
-El frontend está en `src/main/resources/static` y consume la API JSON con `fetch`. El backend está en `src/main/java/pe/vales`, separado en `api`, `service`, `domain`, `persistence` y `config`. Spring Boot sirve ambos en el mismo puerto; no hay un proceso frontend independiente.
+La presentación sigue **Model–View–ViewModel (MVVM)** tanto para atención como para login:
+
+| Capa | Ubicación | Responsabilidad |
+| --- | --- | --- |
+| View | HTML y `static/js/views/` | Presenta el estado y enlaza los eventos de la pantalla con comandos del ViewModel |
+| ViewModel | `static/js/viewmodels/` | Mantiene filtros, selección, borradores, totales, mensajes y estados de carga/guardado |
+| Model | `static/js/models/` | Expone sesión y operaciones de vales; incluye las reglas de presentación y el contrato de datos con la API |
+| Infraestructura | `static/js/core/` | Cliente HTTP con CSRF y clase base observable |
+| Backend del modelo | `src/main/java/pe/vales/` | API REST, reglas definitivas de consumo, transacciones y persistencia |
+
+La View se suscribe al ViewModel; el ViewModel usa modelos inyectados y no depende del DOM ni de `fetch`. La View no realiza peticiones HTTP. Los puntos de entrada `static/js/app.js` y `static/js/login.js` solo conectan las clases. No se utiliza un framework frontend ni se añaden dependencias de ejecución.
+
+El backend conserva sus capas `api`, `service`, `domain`, `persistence` y `config`. Sus controladores HTTP son adaptadores de transporte; el ViewModel es la capa de presentación del cliente. Spring Boot sirve todo en el mismo puerto. Más detalles y diagrama: [docs/ARQUITECTURA_MVVM.md](docs/ARQUITECTURA_MVVM.md).
 
 ## Verificación
 
@@ -97,8 +109,8 @@ python3 scripts/verificar-frontend.py
 ./gradlew test bootJar
 ```
 
-En Windows, ejecuta `.\gradlew.bat test bootJar`; los scripts `.sh` requieren Bash. El primer comando usa exclusivamente el JDK. El segundo requiere JavaScriptCore GTK instalado en Linux y revisa sintaxis y aritmética; no es una prueba de navegador. `gradlew test` ejecuta los contratos HTTP/JDBC para `vales` y `logis_vales` sobre H2, incluyendo rollback y solicitudes concurrentes. El JAR se genera en `build/libs/vales-atencion-1.0.0.jar`; se inicia con `java -jar build/libs/vales-atencion-1.0.0.jar` y las mismas variables de entorno.
+En Windows, ejecuta `.\gradlew.bat test bootJar`; los scripts `.sh` requieren Bash. El primer comando usa exclusivamente el JDK. El segundo requiere JavaScriptCore GTK instalado en Linux y comprueba sintaxis, separación de capas y 25 pruebas del modelo/ViewModel; no es una prueba de navegador. Si tienes Node.js instalado, puedes ejecutar las mismas 25 pruebas con `node scripts/test-frontend.cjs`, sin instalar paquetes. Node es opcional y no se necesita para usar la aplicación. `gradlew test` ejecuta los contratos HTTP/JDBC para `vales` y `logis_vales` sobre H2, incluyendo rollback y solicitudes concurrentes. El JAR se genera en `build/libs/vales-atencion-1.0.0.jar`; se inicia con `java -jar build/libs/vales-atencion-1.0.0.jar` y las mismas variables de entorno.
 
-**Estado de verificación:** pasaron 28 comprobaciones del dominio, la sintaxis de ambos archivos JavaScript y 13 comprobaciones de cálculo/formato del frontend. Posteriormente se confirmó la compilación y el arranque local: Tomcat inició en el puerto 8080 y H2 estableció la conexión. Las pruebas de integración, los recorridos completos de la interfaz y la conexión con PostgreSQL administrativo siguen pendientes de verificación. El entorno del agente tiene restricciones de red; las descargas y el arranque se completaron desde la terminal del usuario.
+**Estado de verificación:** pasaron 28 comprobaciones del dominio. Tras reorganizar en MVVM, pasaron la revisión de sintaxis de los scripts, las comprobaciones de separación de capas y 25 pruebas de modelos/ViewModels, que incluyen la aritmética anterior. Posteriormente se confirmó la compilación y el arranque local: Tomcat inició en el puerto 8080 y H2 estableció la conexión. Las pruebas de integración, los recorridos completos de la interfaz y la conexión con PostgreSQL administrativo siguen pendientes de verificación. El entorno del agente tiene restricciones de red; las descargas y el arranque se completaron desde la terminal del usuario.
 
 No se implementan emisión, autorización, facturación, anulación ni PDF. Los estados ajenos al consumo se muestran únicamente para validar el flujo del caso B.

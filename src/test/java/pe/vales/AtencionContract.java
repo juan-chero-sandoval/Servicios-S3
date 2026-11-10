@@ -39,6 +39,15 @@ abstract class AtencionContract {
     String body(String code,String cantidad,String precio) {
         return "{\"vales\":[{\"codigoVale\":\""+code+"\",\"cantidadConsumida\":"+cantidad+",\"precioReal\":"+precio+",\"ticket\":\"T001-42\"}]}";
     }
+    @Test void sirveLoginMvvmSinSesion() throws Exception {
+        mvc.perform(get("/login.html")).andExpect(status().isOk())
+            .andExpect(content().string(org.hamcrest.Matchers.containsString("/js/login.js")));
+        for (String asset : List.of("core/observable-view-model.js", "core/api-client.js", "models/session-model.js",
+                "viewmodels/login-view-model.js", "views/login-view.js", "login.js")) {
+            mvc.perform(get("/js/" + asset)).andExpect(status().isOk())
+                .andExpect(content().string(org.hamcrest.Matchers.containsString("use strict")));
+        }
+    }
     @Test void registraConsumoYNoModificaEmision() throws Exception {
         mvc.perform(post("/api/atenciones").with(user("operador").roles("GRIFO")).with(csrf()).contentType(MediaType.APPLICATION_JSON).content(body("2026110001","10.25","16.90")))
             .andExpect(status().isCreated()).andExpect(jsonPath("$[0].estadoVale").value(2))
