@@ -60,12 +60,16 @@ export DB_USER='usuario_del_servicio'
 export OPERADOR_USUARIO='operador'
 export OPERADOR_RUC='20100032458'
 export VALE_TABLE='vales'
+# En HTTPS: true. En local por HTTP: false.
+export COOKIE_SECURE='false'
 ./gradlew bootRun
 ```
 
 `DB_PASSWORD` y `OPERADOR_PASSWORD` son obligatorias en PostgreSQL; no hay contraseña demo como alternativa en este perfil. El usuario debe contener 1–8 caracteres alfanuméricos para respetar `usuario VARCHAR(8)`; la contraseña debe tener al menos 8 caracteres. El RUC debe tener 11 dígitos. El archivo [configuracion.env.example](configuracion.env.example) enumera las variables; la aplicación **no carga archivos `.env` automáticamente**.
 
 Si A registra en `logis_vales`, configura **`VALE_TABLE=logis_vales`**. Se adaptan los nombres de precio y unidad, y se valida también `estado=true`. Las tablas de catálogo deben tener los nombres sin prefijo definidos en el segundo adjunto. No se mezclan ni sincronizan las dos tablas de vales.
+
+Los índices recomendados para la base real están en [docs/indices-recomendados.sql](docs/indices-recomendados.sql). Revísalos con el profesor antes de aplicarlos sobre la base administrativa.
 
 A y B comparten PostgreSQL: A inserta y autoriza; B consulta esos mismos registros y actualiza únicamente los campos de atención. No se necesita duplicar A ni implementar una API de emisión. La demo reemplaza su dependencia mediante un sembrado aislado en el perfil `demo`.
 
@@ -85,6 +89,12 @@ Contrato y ejemplo de consumo: [docs/API.md](docs/API.md).
 
 La aplicación escucha inicialmente solo en `127.0.0.1`. `SERVER_ADDRESS` y `PORT` permiten configurar la dirección y puerto del despliegue. La configuración de un servidor compartido, HTTPS e identidades corporativas corresponde al entorno donde se integrará el servicio.
 
+## Salud del servicio
+
+`GET /actuator/health` es público y responde `{"status":"UP"}` sin detalles. Es el endpoint para el healthcheck de Docker o del orquestador. Los demás endpoints de actuator no están expuestos.
+
+En HTTPS configura `COOKIE_SECURE=true`; en local por HTTP debe quedar en `false`.
+
 ## Organización del código
 
 La aplicación utiliza **Model–View–Controller (MVC)** para atención y login:
@@ -103,13 +113,17 @@ Spring MVC expone la API JSON desde `controller/ValeController.java`. `model/Val
 ## Verificación
 
 ```bash
+# Gate reproducible del proyecto
+make gate
+
+# Equivalente manual
 ./scripts/verificar-dominio.sh
-python3 scripts/verificar-frontend.py
-./gradlew test bootJar
+node scripts/test-frontend.cjs
+./gradlew check bootJar
 ```
 
-En Windows, ejecuta `.\gradlew.bat test bootJar`; los scripts `.sh` requieren Bash. El primer comando usa exclusivamente el JDK. El segundo requiere JavaScriptCore GTK instalado en Linux y comprueba sintaxis, separación de capas y 27 pruebas de modelos/controladores; no es una prueba de navegador. Si tienes Node.js instalado, puedes ejecutar las mismas 27 pruebas con `node scripts/test-frontend.cjs`, sin instalar paquetes. Node es opcional y no se necesita para usar la aplicación. `gradlew test` ejecuta los contratos HTTP/JDBC para `vales` y `logis_vales` sobre H2, incluyendo rollback y solicitudes concurrentes. El JAR se genera en `build/libs/vales-atencion-1.0.0.jar`; se inicia con `java -jar build/libs/vales-atencion-1.0.0.jar` y las mismas variables de entorno.
+`make gate` ejecuta las verificaciones de dominio y los tests de Gradle. `node scripts/test-frontend.cjs` ejecuta las 27 pruebas MVC; Node es opcional y no se necesita para usar la aplicación. `./gradlew check bootJar` genera el JAR, ejecuta los contratos HTTP/JDBC para `vales` y `logis_vales` sobre H2 (incluyendo rollback y concurrencia) y genera la cobertura. El JAR se genera en `build/libs/vales-atencion-1.0.0.jar`; se inicia con `java -jar build/libs/vales-atencion-1.0.0.jar` y las mismas variables de entorno.
 
-**Estado de verificación:** pasaron 28 comprobaciones del dominio, la revisión de sintaxis y separación de capas, y 27 pruebas de modelos/controladores MVC. Se compilaron todas las clases Java principales con las dependencias disponibles. El arranque con H2 de la versión previa fue confirmado desde la terminal del usuario. El arranque de esta reorganización MVC, las pruebas completas de integración, los recorridos de interfaz y PostgreSQL administrativo siguen pendientes de verificación en una terminal que permita abrir sockets. Consulta [docs/VERIFICACION.md](docs/VERIFICACION.md).
+**Estado de verificación (10/11/2026):** `gradle check bootJar` con Gradle 8.14.6 y JDK 21: **BUILD SUCCESSFUL**. Pasaron **20 pruebas de integración** (10 para `vales` y 10 para `logis_vales`), **28 verificaciones de dominio** y **27 pruebas MVC de frontend**, sin fallos. El arranque con H2 y `GET /actuator/health` se verificaron en Docker. La conexión contra PostgreSQL administrativo sigue pendiente de credenciales o dump del profesor. Consulta [docs/VERIFICACION.md](docs/VERIFICACION.md).
 
 No se implementan emisión, autorización, facturación, anulación ni PDF. Los estados ajenos al consumo se muestran únicamente para validar el flujo del caso B.

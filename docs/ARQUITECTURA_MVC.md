@@ -117,7 +117,7 @@ node scripts/test-frontend.cjs
 
 La suite `scripts/tests/frontend-mvc.spec.js` contiene 27 pruebas. Utiliza los modelos y controladores reales, una vista espía y respuestas de datos simuladas. Comprueba que el controlador enlace eventos y renderice la vista, que el modelo funcione sin vista ni suscripciones, y los casos de consumo, selección, errores, concurrencia de solicitudes, sesión y CSRF.
 
-El verificador también revisa sintaxis, referencias a archivos, selectores y límites entre capas. Las pruebas HTTP/JDBC se ejecutan con `./gradlew test bootJar` o `.\gradlew.bat test bootJar` en Windows. La revisión completa en navegador es adicional; consulta [VERIFICACION.md](VERIFICACION.md).
+El verificador también revisa sintaxis, referencias a archivos, selectores y límites entre capas. Las pruebas HTTP/JDBC se ejecutan con `./gradlew check bootJar` o `.\gradlew.bat check bootJar` en Windows. La revisión completa en navegador es adicional; consulta [VERIFICACION.md](VERIFICACION.md).
 
 ## Actualización local
 

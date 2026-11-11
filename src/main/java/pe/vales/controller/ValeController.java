@@ -4,6 +4,7 @@ import java.util.*;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
@@ -40,7 +41,7 @@ public class ValeController {
     }
     @GetMapping("/zonales") public List<Map<String,Object>> zonales() { return repo.zonales(ruc); }
     @GetMapping("/resumen") public Map<String,Object> resumen() { return repo.resumen(ruc); }
-    @PostMapping("/atenciones") @ResponseStatus(org.springframework.http.HttpStatus.CREATED)
+    @PostMapping("/atenciones") @ResponseStatus(HttpStatus.CREATED)
     public List<Vale> atender(@RequestBody @Valid AtencionRequest request, Principal principal) {
         return service.registrar(request,ruc,principal.getName());
     }

@@ -50,13 +50,13 @@ El caso B aplica una sola atención por vale: una cantidad menor también cierra
 Linux/macOS:
 
 ```bash
-./gradlew test bootJar
+./gradlew check bootJar
 ```
 
 Windows PowerShell:
 
 ```powershell
-.\gradlew.bat test bootJar
+.\gradlew.bat check bootJar
 ```
 
 El reporte de pruebas queda en `build/reports/tests/test/index.html`. Las pruebas de integración usan bases H2 en memoria independientes de `data/vales-demo`; incluyen atención, validaciones, sesión, CSRF, rollback y concurrencia para `vales` y `logis_vales`.
